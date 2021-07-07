@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<head>
+<script src="script.js"></script>
+<link rel="stylesheet" href="style.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+<body onload=start()>
+
+    <h1> ricochet robots solver</h1>
+    <input type="radio" id="cg" name="mouse_action" value="change grid">
+    <label for="cg" > change grid</label>
+
+    <input type="radio" id="pr" name="mouse_action" value="place robots">
+    <label for = "pr" > place robots</label>
+
+    <input type="radio" id= "mg" name="mouse_action" value="move goal">
+    <label for = "mg"> move goal</label>
+    
+    <input type="radio" id= "mr" name="mouse_action" value="move robots">
+    <label for = "mr"> move robots</label>
+
+    <input type="radio" id= "none" name="mouse_action" value="none">
+    <label for = "none"> none</label>
+
+    <div>
+    <label for="solver">Solve for what robot?:</label>
+    <select id="solver" name="cars" size="5">
+      <option value="red" selected >Red</option>
+      <option value="green">Green</option>
+      <option value="orange">Orange</option>
+      <option value="blue">Blue</option>
+      <option value="any">Any</option>
+    </select>
+    <br>
+    <button type="button" onclick=solve()>SOLVE</button>
+</div>
+
+</div>
+    <div id = gameboard>
+        <table id="gameBoardA"></table>
+        <table id="gameBoardB"></table>
+        <table id="gameBoardC"></table>
+        <table id="gameBoardD"></table>
+    </div>
+
+
+
+</body>

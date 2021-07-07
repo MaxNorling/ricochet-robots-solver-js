@@ -1,0 +1,72 @@
+table{
+    float:left;
+    width:250px;
+    height:250px;
+    
+}
+
+td{
+    width: 25px;
+    height: 25px;
+    background:orange;
+    padding-left: 2px;
+
+}
+
+
+#gameboard
+{
+    display:inline-block;
+    width:500px;
+}
+.North{
+    border-top: 5px solid black;
+    height:20px;
+
+
+}
+
+.West{
+    border-left: 5px solid black;
+    width: 20px;
+}
+
+.East{
+    border-right: 5px solid black;
+    width: 20px;
+}
+
+.South{
+    border-bottom: 5px solid black;
+    height:20px;
+}
+.robot{
+    height: 20px;
+    width: 20px;
+    float:left;
+    border-radius: 50%;
+
+}
+#blueRobot{
+    background-color: blue;
+}
+#redRobot{
+    background-color: red;
+}
+#greenRobot{
+    background-color: green;
+}
+#orangeRobot{
+    background-color: yellow;
+}
+
+.goal{
+ background-color: palevioletred;
+}
+/*
+.highlight{
+    outline:5px solid greenyellow;
+    width:100px
+    
+}
+*/
