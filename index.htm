@@ -20,6 +20,9 @@
     <input type="radio" id= "mr" name="mouse_action" value="move robots">
     <label for = "mr"> move robots</label>
 
+    <input type="radio" id= "rb" name="mouse_action" value="rotate board">
+    <label for = "rb"> rotate board</label>
+
     <input type="radio" id= "none" name="mouse_action" value="none">
     <label for = "none"> none</label>
 
@@ -34,6 +37,10 @@
     </select>
     <br>
     <button type="button" onclick=solve()>SOLVE</button>
+    <textarea placeholder="current board" id="cBoard"></textarea>
+    <button type="button" onclick=save_board()>SAVE BOARD</button>
+    <button type="button" onclick=load_board()>LOAD BOARD</button>
+    <button type="button" onclick=revert_to_base()>CLEAR BOARD</button>
 </div>
 
 </div>

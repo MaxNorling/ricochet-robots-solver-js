@@ -25,13 +25,13 @@ const directions = [
 let placing_robot = null;
 let selected_robot = null;
 
-const boardA = [[5, 1, 1, 1, 8, 1, 1, 8],
-                [3, 0, 7, 0, 0, 0, 0, 0],
-                [6, 0, 0, 0, 0, 1, 8, 0],
+const boardA = [[5, 1, 1, 1, 1, 5, 1, 1],
                 [3, 0, 0, 0, 0, 0, 0, 0],
-                [3, 0, 0, 0, 0, 0, 6, 0],
-                [3, 0, 7, 0, 0, 8, 0, 0],
+                [3, 5, 0, 0, 0, 0, 7, 0],
                 [3, 0, 0, 0, 0, 0, 0, 0],
+                [3, 0, 0, 0, 0, 0, 0, 0],
+                [3, 0, 0, 0, 0, 0, 8, 0],
+                [5, 0, 0, 6, 0, 0, 0, 0],
                 [3, 0, 0, 0, 0, 0, 0, 5],
                 ];
 
@@ -50,7 +50,7 @@ const boardC = [[3, 0, 0, 0, 0, 0, 0, 6],
                 [3, 0, 0, 0, 0, 0, 0, 0],
                 [3, 0, 0, 5, 0, 6, 0, 0],
                 [6, 0, 0, 0, 0, 0, 0, 0],
-                [3, 0, , 0, 0, 7, 0, 0],
+                [3, 0, 0, 0, 0, 7, 0, 0],
                 [3, 0, 0, 7, 0, 0, 0, 0],
                 [6, 4, 6, 4, 7, 4, 4, 4],
                 ];
@@ -65,6 +65,10 @@ const boardD = [[7, 0, 0, 0, 0, 0, 0, 2],
                 [4, 6, 4, 4, 4, 4, 4, 7],
                 ];
 
+let boards = [boardA, boardB, boardC, boardD]
+
+let base_layout = "51F30F30F30F30F30F30F30E51F80F20F20F20F20F20F280E230E630F30F30F30F30F30F64F70E20F20F20F20F20F20F24F7"
+
 let robots = 
 [
     {color: "blue", x:1, y:12, sx : 1, sy : 12},
@@ -73,7 +77,104 @@ let robots =
     {color: "green", x:14, y:14, sx : 14, sy : 14}
 ]
 
+let char_to_int = {
+    0:"", 1:"A", 2:"B", 3:"C", 4:"D", 5:"E", 6:"F", 7:"G", 8:"H", 9:"I", 10:"J", 11:"K", 12:"L", 13:"M", 14:"N", 15:"O", 16:"P", 17:"Q",
+    18:"R", 19:"S", 20:"T", 21:"U", 22:"V", 23:"W", 24:"X", 25:"Y", 26:"Z", 27:"a", 28:"b", 29:"c", 30:"d", 31:"e", 32:"f", 33:"g", 34:"h", 35:"i",
+    36:"j", 37:"k", 38:"l", 39:"m", 40:"n", 41:"o", 42:"p", 43:"q", 44:"r", 45:"s", 46:"t", 47:"u", 48:"v", 49:"w", 50:"x", 51:"y", 52:"z", 53:".",
+    54:"-",55:"!",56:"#",57:"%",58:"(",59:")",60:"{", 61:"}",62:"[",63:"*"
+}
+
+let int_to_char = {
+    "A": 1,"B": 2,"C": 3,"D": 4,"E": 5,"F": 6,"G": 7,"H": 8,"I": 9,"J": 10,"K": 11,"L": 12,"M": 13,"N": 14,"O": 15,"P": 16,
+    "Q": 17,"R": 18,"S": 19,"T": 20,"U": 21,"V": 22,"W": 23,"X": 24,"Y": 25,"Z": 26,"a": 27,"b": 28,"c": 29,"d": 30,"e": 31,
+    "f": 32,"g": 33,"h": 34,"i": 35,"j": 36,"k": 37,"l": 38,"m": 39,"n": 40,"o": 41,"p": 42,"q": 43,"r": 44,"s": 45,"t": 46,
+    "u": 47,"v": 48,"w": 49,"x": 50,"y": 51,"z": 52,".": 53,"-": 54, "!":55,"#":56, "%":57,"(":58, ")":59, "{":60, "}":61,"[":62,"*":63
+}
+
 let currGoal = {x:12, y:14}
+
+function save_board(){
+    let out = ""
+    
+    let curr_board;
+    let count = 0
+    let curr_char = "."
+    
+    for (let z = 0; z < boards.length; z++){
+        curr_board = boards[z]
+
+        for (let i = 0; i < curr_board.length; i++){
+            for(let j = 0; j < curr_board[i].length; j++){
+                if(curr_board[i][j] == curr_char && count != 63){
+                    count+=1
+
+                }else{
+                    out += char_to_int[count] + curr_board[i][j];
+                    count = 0
+                    curr_char = curr_board[i][j]
+                }
+                
+            }    
+        }
+    }
+    if(count > 0){
+        out += char_to_int[count] + curr_char;
+        count = 0
+    }
+    document.getElementById("cBoard").value = out;
+    return out
+}
+
+
+function load_board(){
+    let in_board = document.getElementById("cBoard").value;
+    //"51B81A83070D60C18030F30D603070A80A30F30E51C51A80F20A70A6020C40A20560C70870B620F280D8730E6A0F30F30A5060A60F30C70A30A70C646474B70E20F20A50C20C60A20F70A70C20D702464D7"
+    let curr_board = boardA
+    let count = 1
+    let c_char = ""
+    let uncompressed = ""
+
+    for (let i = 0; i < in_board.length; i++) {
+        c_char = in_board[i]
+        if(i+1 < in_board.length){
+            if(in_board[i+1].search(/[^A-Za-z._!#%\(\)\[\]\{\}\\*s]/) == -1){
+                count += int_to_char[in_board[i+1]]
+                i=i+1    
+            }
+        }
+
+        uncompressed+=c_char.repeat(count)
+        count = 1
+        
+    }
+    let cCol = 0, cRow = 0;
+    for(let i = 0; i < uncompressed.length; i++){
+        curr_board = boards[Math.floor(i / 64)]
+        if(cCol == 7){
+            cRow = (cRow + 1)%8
+            
+        }
+        cCol = i%8;
+        curr_board[cRow][cCol] = parseInt(uncompressed[i]);
+        
+        
+        
+    }
+
+    
+
+    refresh()
+    return 0
+}
+
+function revert_to_base(){
+    document.getElementById("cBoard").value = base_layout;
+    load_board()
+    document.getElementById("cBoard").value = "";
+
+    
+}
+
 
 function displayBoard(){
     let html_boardA = document.getElementById("gameBoardA")
@@ -254,6 +355,9 @@ function placeRobot(target, robot){
         
         placing_robot.x = y
         placing_robot.y = x
+
+        placing_robot.sx = y
+        placing_robot.sy = x
         robots.push(placing_robot)
         placing_robot = null;
         
@@ -350,6 +454,20 @@ function start(){
         }
     }
 
+
+    });
+
+    $(document).on('contextmenu', function (e) {
+        if (e.target.matches('#gameboard *')) {
+            let gb = e.target.parentElement.parentElement.id
+            if(e.target.className == "robot"){
+                gb = e.target.parentElement.parentElement.parentElement.id
+            }
+            changeBoard(gb)
+        return false
+
+        }
+ 
 
     });
 }
@@ -643,6 +761,160 @@ function createGameState(){
     }
     console.log("GOAL NOT FOUND")
     refresh()
+    return False
+
+}
+
+function hueristic(rx, ry){
+    //return Math.abs(rx - currGoal.x) + Math.abs(ry - currGoal.y)
+    let h = 0
+    if(rx != currGoal.x){
+        h+=1
+    }
+    if(ry != currGoal.y){
+        h+=1
+    }
+    return h
+
+}
+
+function aStar(robot, grd){
+
+    let o = 0;
+    // Treat all gamestates as nodes, aka all unique positions of the robots.
+    let curr_robots  = robots;
+    let gamestate = createGameState()
+    let open_list  =  new PriorityQueue((a, b) => a[1] > b[1]);
+    let closed_list = new PriorityQueue((a, b) => a[1] > b[1]);
+    let explored = new Map();
+    let curr_robot, base_robot;
+    selected_robot = robot;
+    let robot__to_goal_x = selected_robot.x;
+    let robot__to_goal_y = selected_robot.y;
+
+    let state_str = ""
+    for (let i = 0; i < robots.length; i++){
+        state_str+=robots[i].color + ":" + robots[i].x + ":" + robots[i].y + "-"
+    }
+
+    open_list.push([[state_str, ""],hueristic(robot__to_goal_x, robot__to_goal_y) + 0]);
+    explored.set(state_str, gamestate);
+    console.log(queue)
+
+    while(open_list.size() > 0 ){
+
+        
+
+        let curr_state = open_list.pop()
+        closed_list.push(curr_state)
+        curr_state = curr_state[0]
+        let curr_moves = curr_state[1]
+        curr_state = curr_state[0]
+        let curr_robots = getRobotsFromState(curr_state)
+        
+        //console.log("curr state:",curr_state)
+
+
+        if(selected_robot == null){
+            if(curr_robot != null){
+                for(let s = 0; s < curr_robots.length; s++){
+                    if(curr_robots[s].x == currGoal.x && curr_robots[s].y == currGoal.y){
+                        console.log("GOAL FOUND")
+                        return [curr_state, curr_moves]
+                    }
+                }
+            }
+
+
+
+        }else{
+            for(let s = 0; s < curr_robots.length; s++){
+
+                if(curr_robots[s].color == robot.color){
+                    curr_robot = curr_robots[s]
+                }
+            }
+
+            if(curr_robot.x == currGoal.x && curr_robot.y == currGoal.y && curr_robot.color == selected_robot.color){
+                console.log("GOAL FOUND")
+                return [curr_state, curr_moves]
+            }
+        }
+ 
+
+        if(curr_moves.length < 300){
+        
+
+        for (let u = 0; u < curr_robots.length; u++){
+
+            base_robot = $.extend({}, curr_robots[u]);
+
+            for(let i = 0; i < directions.length; i++){
+                curr_robot = $.extend({}, base_robot);
+                let curr_dir = directions[i]
+                let opp = "";
+                let col = false;
+                switch(curr_dir){
+                    case "NORTH": opp = "SOUTH"; break;
+                    case "SOUTH": opp = "NORTH"; break;
+                    case "WEST": opp = "EAST"; break;
+                    case "EAST": opp = "WEST"; break;
+    
+                }
+
+               while (!col){
+                    if(collision(curr_robot, curr_dir, curr_robots)){
+                        col = true;
+            
+                    }
+                    if(!col)
+                        curr_robot = autoMoveRobot(curr_robot, curr_dir);
+    
+                    if(collision(curr_robot, opp, curr_robots)){
+                        col = true;
+                        switch(curr_dir){
+                            case "NORTH": curr_robot.y +=1;  break;
+                            case "SOUTH": curr_robot.y -=1;  break;
+                            case "WEST":  curr_robot.x +=1;  break;
+                            case "EAST":  curr_robot.x -=1;  break;
+            
+                        }                }
+               }
+                
+
+                    let state_str = ""
+                    for (let i = 0; i < curr_robots.length; i++){
+                        if(curr_robots[i].color == curr_robot.color){
+                            state_str+=curr_robot.color + ":" + curr_robot.x + ":" + curr_robot.y + "-"
+    
+                        }else{
+                            state_str+=curr_robots[i].color + ":" + curr_robots[i].x + ":" + curr_robots[i].y + "-"
+                        }
+                        
+                    }
+        
+                    if(!explored.get(state_str)){
+                        explored.set(state_str, true)
+                        open_list.push([[state_str, curr_moves + curr_robot.color + "-" +  curr_dir + ":"], curr_moves.length + hueristic(robot__to_goal_x, robot__to_goal_x)]);                
+                    }
+                    /*
+                    if(queue.length > 10000){
+                        console.log("QUEUE TOO LARGE")
+                        return
+                    }
+                    */
+        
+    
+           
+            }
+        }
+    }
+        
+
+        //console.log("quueue:",queue)
+    }
+    console.log("GOAL NOT FOUND")
+    refresh()
 
 }
 
@@ -690,11 +962,14 @@ function solve(){
     let insta_display = false
     if(selectedRobot === "any"){
         after_pos = bfs(null, grd)
+        //after_pos = aStar(null, grd)
         
     }else{
         for(let i = 0; i < robots.length; i++){
             if(robots[i].color === selectedRobot){
                 after_pos = bfs(robots[i], grd)
+                //after_pos = aStar(robots[i], grd)
+                break
             }
         }
     }
@@ -779,6 +1054,65 @@ function after_game_button(moves){
 
 }
 
+// JSON fil med "standard boards" 4 plattor 2 sidor per platta så 8 olika bord per 
+
+
+function changeBoard(boardname){
+    let z =  [[5, 1, 1, 1, 1, 5, 1, 1],
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 5, 0, 0, 0, 0, 7, 0],
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 0, 0, 0, 0, 0],
+    [3, 0, 0, 0, 0, 0, 8, 0],
+    [5, 0, 0, 6, 0, 0, 0, 0],
+    [3, 0, 0, 0, 0, 0, 0, 5],
+    ];
+    let currBoard = ""
+    let normalWallNS, normalWallWE, wallWallWE,wallWallNS, RIGHTSIDE, TOPSIDE;
+    switch(boardname[boardname.length-1]){
+        case "A": currBoard = boardA; normalWallNS = 1; normalWallWE = 3; wallWallWE = 6; wallWallNS = 5; RIGHTSIDE = false; TOPSIDE = true; break;
+        case "B": currBoard = boardB; normalWallNS = 1; normalWallWE = 2; wallWallWE = 6; wallWallNS = 8; RIGHTSIDE = true; TOPSIDE = true; break;
+        case "C": currBoard = boardC; normalWallNS = 4; normalWallWE = 3; wallWallWE = 7; wallWallNS = 6; RIGHTSIDE = false; TOPSIDE = false; break;
+        case "D": currBoard = boardD; normalWallNS = 4; normalWallWE = 2; wallWallWE = 7; wallWallNS = 7; RIGHTSIDE = true; TOPSIDE = false; break;
+        default: console.log("ERROR", boardname); return ;
+    }
+
+    for (let i = 0; i < WIDTH; i++){
+        for (let j = 0 ; j < HEIGHT; j++){
+            switch(z[i][j]){
+                case 1: currBoard[i][j] = normalWallNS; break;
+                case 3: currBoard[i][j] = normalWallWE; break;
+                case 5: currBoard[i][j] = wallWallNS; break;
+                case 6: currBoard[i][j] = wallWallWE; break;
+                default:currBoard[i][j] = z[i][j]; break;
+
+            }
+            
+        }    
+    }
+    
+    if(RIGHTSIDE){
+        for(let k = 0; k < HEIGHT; k++){
+            //[currBoard[k][0], currBoard[k][currBoard[k].length - 1]] = [currBoard[k][currBoard[k].length - 1], currBoard[k][0]];
+            currBoard[k].reverse()
+
+        }
+        
+    }
+
+    if(!TOPSIDE){
+ 
+        currBoard.reverse()
+
+    
+}
+
+console.log(currBoard)
+    refresh()
+}
+
+
+
 //TODO
 // Saveable maps, typ hasha griden på något fint sätt.'
 
@@ -836,3 +1170,71 @@ function after_game_button(moves){
 		return null;
 	}
 */
+const ztop = 0;
+const parent = i => ((i + 1) >>> 1) - 1;
+const left = i => (i << 1) + 1;
+const right = i => (i + 1) << 1;
+
+
+class PriorityQueue {
+  constructor(comparator = (a, b) => a > b) {
+    this._heap = [];
+    this._comparator = comparator;
+  }
+  size() {
+    return this._heap.length;
+  }
+  isEmpty() {
+    return this.size() == 0;
+  }
+  peek() {
+    return this._heap[ztop];
+  }
+  push(...values) {
+    values.forEach(value => {
+      this._heap.push(value);
+      this._siftUp();
+    });
+    return this.size();
+  }
+  pop() {
+    const poppedValue = this.peek();
+    const bottom = this.size() - 1;
+    if (bottom > ztop) {
+      this._swap(ztop, bottom);
+    }
+    this._heap.pop();
+    this._siftDown();
+    return poppedValue;
+  }
+  replace(value) {
+    const replacedValue = this.peek();
+    this._heap[ztop] = value;
+    this._siftDown();
+    return replacedValue;
+  }
+  _greater(i, j) {
+    return this._comparator(this._heap[i], this._heap[j]);
+  }
+  _swap(i, j) {
+    [this._heap[i], this._heap[j]] = [this._heap[j], this._heap[i]];
+  }
+  _siftUp() {
+    let node = this.size() - 1;
+    while (node > ztop && this._greater(node, parent(node))) {
+      this._swap(node, parent(node));
+      node = parent(node);
+    }
+  }
+  _siftDown() {
+    let node = ztop;
+    while (
+      (left(node) < this.size() && this._greater(left(node), node)) ||
+      (right(node) < this.size() && this._greater(right(node), node))
+    ) {
+      let maxChild = (right(node) < this.size() && this._greater(right(node), left(node))) ? right(node) : left(node);
+      this._swap(node, maxChild);
+      node = maxChild;
+    }
+  }
+}
